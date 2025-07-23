@@ -4,7 +4,7 @@ A Python-based tool designed to **monitor in-game chat traffic** in KoGaMa by ta
 
 ---
 
-## [] Requirements
+## [🧾] Requirements
 
 ```
 pip install colorama
