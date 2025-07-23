@@ -4,6 +4,15 @@ A Python-based tool designed to **monitor in-game chat traffic** in KoGaMa by ta
 
 ---
 
+## [] Requirements
+
+```
+pip install colorama
+pip install scapy
+```
+
+[NpCap](https://npcap.com/) Must be installed
+
 ## [⚙️] How It Works
 
 - **Target Port**: Listens to KoGaMa’s UDP traffic on port `5055`, specifically connected to the following server IPs:
