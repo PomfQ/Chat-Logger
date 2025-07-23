@@ -35,7 +35,7 @@ If the username is unavailable, the script will fall back to displaying the acto
 [Actor_1] : [Message]
 
 - **Private Chat Support**:  
-This tool can also capture **private chat traffic**, including *Team chat* and other non-global channels.
+This tool can also capture **private chat traffic**, including **Team chat**
 
 ---
 
