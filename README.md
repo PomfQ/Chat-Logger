@@ -48,7 +48,7 @@ This tool can also capture **private chat traffic**, including **Team chat**
 
 ## [💬] Example Output
 
-![Output Example](https://cdn.discordapp.com/attachments/1264627993477906584/1396865876325826610/image.png?ex=687fa439&is=687e52b9&hm=4b9c239add3ec4257cd64c4e3a270d0727a12945c4d552ab31f834a421cb59a1&) <br>
+![Output Example](https://cdn.discordapp.com/attachments/1264627993477906584/1396865876325826610/image.png?ex=6888deb9&is=68878d39&hm=e8cf8cd270690f7eeddaa6eb45706c2c9fe77a5ed438d72333c1329b3a5d21cf&) <br>
 [Showcase](https://www.youtube.com/watch?v=0sCNGpk0Ldo&ab)
 
 ## Credits
