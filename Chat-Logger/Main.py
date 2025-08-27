@@ -3,13 +3,28 @@ from datetime import datetime
 from colorama import Fore, Style, init
 import re
 import json
+import requests
 
 init(autoreset=True)
 
 actor_map = {}  # Maps actor_id -> username
 
-LOCAL_IP = ""  # Replace with your actual local_IP (IMPORTANT)
+LOCAL_IP = "YOUR_LOCAL_IP"  # Replace with your actual local_IP (IMPORTANT)
 CHAT_HEADER = re.compile(b"\x62\x05\x73\x00")
+
+WEBHOOK_URL = "YOUR_WEBHOOK_URL"
+
+def send_to_discord(content):
+    try:
+        if not WEBHOOK_URL:
+            return
+        data = {"content": content}
+        r = requests.post(WEBHOOK_URL, json=data)
+        if r.status_code != 204:
+            print(f"[WARN] Discord webhook error: {r.status_code}, {r.text}")
+    except Exception as e:
+        print(f"[ERROR] Failed to send to Discord: {e}")
+
 
 def safe_decode(data):
     if not isinstance(data, bytes):
@@ -56,7 +71,6 @@ def extract_join_info(payload):
             offset = json_start + 1
             continue
 
-        # After the JSON, search forward for the next FE 69
         fe_index = payload.find(b'\xfe\x69', json_start + len(json_bytes))
         actor_id = None
         if fe_index != -1 and fe_index + 6 <= len(payload):
@@ -99,7 +113,7 @@ def extract_actor_id_after_chat(payload):
     return None
 
 
-def handle_self_join(payload, dst_ip): # Handles Self Join packet only. Sometimes will act as the primary function for detecting Join Info (Was Never intended to be that way but it works.)
+def handle_self_join(payload, dst_ip):
     if dst_ip != LOCAL_IP:
         return
 
@@ -118,6 +132,7 @@ def handle_self_join(payload, dst_ip): # Handles Self Join packet only. Sometime
             data = json.loads(json_bytes.decode('utf-8', errors='ignore'))
             username = data.get("UserName")
             print(f" {Fore.RED}Scanned join username: {username}")
+            send_to_discord(f"Scanned join username: **{username}**")
             if not username:
                 offset = json_start + len(json_bytes)
                 continue
@@ -135,6 +150,7 @@ def handle_self_join(payload, dst_ip): # Handles Self Join packet only. Sometime
             if actor_id not in actor_map:
                 actor_map[actor_id] = username
                 print(f"{Fore.LIGHTBLUE_EX} Join packet: {username} (actor_id={actor_id}){Style.RESET_ALL}")
+                send_to_discord(f"**{username}** joined (actor_id={actor_id})")
                 return
 
         reverse_offset = 0
@@ -146,10 +162,12 @@ def handle_self_join(payload, dst_ip): # Handles Self Join packet only. Sometime
             if actor_id not in actor_map:
                 actor_map[actor_id] = username
                 print(f"{Fore.LIGHTBLUE_EX} Join packet : {username} (actor_id={actor_id}){Style.RESET_ALL}")
+                send_to_discord(f"**{username}** joined (actor_id={actor_id})")
                 return
             reverse_offset = fe_index + 6
 
         offset = json_start + len(json_bytes)
+
 
 def packet_handler(pkt):
     if UDP in pkt:
@@ -160,7 +178,6 @@ def packet_handler(pkt):
         if src_ip == LOCAL_IP and b'{"IsAdmin"' not in payload:
             return
 
-        # Handle join packet
         if b'{"IsAdmin"' in payload:
             handle_self_join(payload, dst_ip)
             results = extract_join_info(payload)
@@ -169,10 +186,11 @@ def packet_handler(pkt):
                     if actor_id not in actor_map:
                         actor_map[actor_id] = username
                         print(f"{Fore.CYAN}[{datetime.now().strftime('%H:%M:%S')}] Player joined: {username} (actor_id={actor_id}){Style.RESET_ALL}")
+                        send_to_discord(f"**{username}** joined (actor_id={actor_id})")
             else:
                 print(f"{Fore.YELLOW} Malformed join result: None{Style.RESET_ALL}")
+                send_to_discord("Malformed join result: None")
 
-        # Handle chat message
         elif CHAT_HEADER.search(payload):
             msg = ultra_clean(payload)
             actor_id = extract_actor_id_after_chat(payload)
@@ -180,9 +198,14 @@ def packet_handler(pkt):
             if msg:
                 if actor_id is not None and actor_id in actor_map:
                     label = f"{Fore.GREEN}{actor_map[actor_id]}{Style.RESET_ALL}"
+                    username = actor_map[actor_id]
                 else:
                     label = f"{Fore.YELLOW}Actor_{actor_id if actor_id is not None else 'UNKNOWN'}{Style.RESET_ALL}"
+                    username = f"Actor_{actor_id if actor_id is not None else 'UNKNOWN'}"
+
                 print(f"[{datetime.now().strftime('%H:%M:%S')}] [{label}] {msg}")
+                send_to_discord(f"**{username}:** {msg}")
+
 
 print(f"{Fore.MAGENTA}Chat-Logger.{Style.RESET_ALL}")
 sniffer = AsyncSniffer(
