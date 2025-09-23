@@ -9,6 +9,7 @@ A Python-based tool designed to **monitor in-game chat traffic** in KoGaMa by ta
 ```
 pip install colorama
 pip install scapy
+pip install requests
 ```
 
 [NpCap](https://npcap.com/) Must be installed
