@@ -1,3 +1,5 @@
+Do whatever you want with this tool, I no longer care about it anymore.
+
 # KoGaMa Chat Monitor
 
 A Python-based tool designed to **monitor in-game chat traffic** in KoGaMa by targeting specific UDP packets. While functional, the tool is **not 100% accurate** and may occasionally display false or partial information — use with caution.
